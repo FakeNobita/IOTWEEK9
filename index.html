@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IOT NPTEL WEEK-9</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .question-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #e5e5e5;
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #333;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 12px;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            background-color: #f8f8f8;
+        }
+
+        .option.selected {
+            border-color: #3b82f6;
+        }
+
+        .option.correct {
+            background-color: #ecfdf5;
+        }
+
+        .option.wrong {
+            background-color: #fef2f2;
+        }
+
+        .option input[type="radio"] {
+            margin-right: 12px;
+        }
+
+        .feedback {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e5e5e5;
+            display: none;
+        }
+
+        .feedback.visible {
+            display: block;
+        }
+
+        .result-icon {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .result-icon.correct {
+            color: #059669;
+        }
+
+        .result-icon.wrong {
+            color: #dc2626;
+        }
+
+        .explanation {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 24px;
+        }
+
+        .score {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .button {
+            background-color: #3b82f6;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+
+        .button:hover {
+            background-color: #2563eb;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>IOT NPTEL WEEK-9</h1>
+        <div id="quiz-container"></div>
+        <div class="controls">
+            <div id="score" class="score"></div>
+            <button id="submit-btn" class="button">Submit Answers</button>
+        </div>
+    </div>
+
+    <script>
+const questions = [
+  {
+    id: 1,
+    question: "Which of the following is/are the advantages of cloud computing?",
+    options: ["Elasticity", "Pay-per-use", "Self Service", "All of the above"],
+    correctAnswer: 3,
+    explanation: "Elasticity, Pay-per-use, and Self Service are all advantages. Lecture 42@6:45."
+  },
+  {
+    id: 2,
+    question: "Fog computing is an intermediate layer between __________ and _________.",
+    options: ["Dew and devices", "Cloud and devices", "Cloud and server", "None of these"],
+    correctAnswer: 1,
+    explanation: "Fog is between Cloud and devices. Lecture 44@6:40."
+  },
+  {
+    id: 3,
+    question: "The managerial role is played by __________ in sensor-cloud architecture.",
+    options: ["End-users", "Sensor-Cloud Service Provider", "Neither a nor b", "Both a and b"],
+    correctAnswer: 1,
+    explanation: "Sensor-Cloud Service Provider manages the architecture. Lecture 42@14:29."
+  },
+  {
+    id: 4,
+    question: "Which of the following is not a component of OpenStack?",
+    options: ["Suse", "Nova", "Swift", "All of these"],
+    correctAnswer: 0,
+    explanation: "Suse is not an OpenStack component. Lecture 41@3:18."
+  },
+  {
+    id: 5,
+    question: "Who coined the term Fog computing?",
+    options: ["IBM", "CISCO", "All of these", "None of these"],
+    correctAnswer: 1,
+    explanation: "CISCO coined the term. Lecture 44@4:18."
+  },
+  {
+    id: 6,
+    question: "The concept of ________ enables physical hardware to be shared among multiple entities.",
+    options: ["Hardware virtualization", "Software virtualization", "Module virtualization", "All of these"],
+    correctAnswer: 0,
+    explanation: "Hardware virtualization enables sharing. Page 262, Chapter 11, IoT by Misra et al."
+  },
+  {
+    id: 7,
+    question: "Openstack is a free open source software for cloud framework simulation and experimentation.",
+    options: ["True", "False"],
+    correctAnswer: 0,
+    explanation: "True. OpenStack is free and open source. Lecture 41."
+  },
+  {
+    id: 8,
+    question: "In IoT, temporal sensitivity of data DOES NOT play an important role.",
+    options: ["True", "False"],
+    correctAnswer: 1,
+    explanation: "Time sensitivity plays a key role in IoT data. Lecture 44."
+  },
+  {
+    id: 9,
+    question: "Which among the following is NOT a component of OpenStack?",
+    options: ["Horizon", "Heat", "Stellar", "Neutron"],
+    correctAnswer: 2,
+    explanation: "Stellar is not a component. Lecture 41, ppt No. 4."
+  },
+  {
+    id: 10,
+    question: "Principal feature of sensor clouds with respect to sensor nodes?",
+    options: ["Sensor monitoring", "Sensor instantiation", "Sensor virtualization", "Sensor collection"],
+    correctAnswer: 2,
+    explanation: "Sensor virtualization is key. Lecture 42 & 43."
+  },
+  {
+    id: 11,
+    question: "The optimal composition of __________ is a management issue in sensor-cloud.",
+    options: ["Logistics", "Pricing", "Caching", "Virtual sensor nodes"],
+    correctAnswer: 3,
+    explanation: "Virtual sensor nodes management is key. Lecture 43@4:39."
+  },
+  {
+    id: 12,
+    question: "How many different types of caching mechanism are there in sensor cloud?",
+    options: ["1", "4", "2", "3"],
+    correctAnswer: 2,
+    explanation: "Two types: Internal Cache and External Cache. Lecture 43, ppt No. 13."
+  },
+  {
+    id: 13,
+    question: "If one-way transfer takes 10s and total roundtrip + processing is 25s, what is processing time?",
+    options: ["10s", "5s", "15s", "20s"],
+    correctAnswer: 1,
+    explanation: "10 (to cloud) + x + 10 (back) = 25; x = 5s."
+  },
+  {
+    id: 14,
+    question: "Which among the following is true?",
+    options: [
+      "Fog computing acts as a complement to cloud computing.",
+      "Fog computing is a replacement for cloud computing.",
+      "Fog computing and cloud computing are the same.",
+      "Fog computing is more powerful than cloud computing."
+    ],
+    correctAnswer: 0,
+    explanation: "Fog complements cloud by being closer to devices. Lecture 45@1:06."
+  },
+  {
+    id: 15,
+    question: "Which component of OpenStack do you use to access all the other components?",
+    options: ["Horizon", "Glance", "Neutron", "None of these"],
+    correctAnswer: 0,
+    explanation: "Horizon is the dashboard GUI. Lecture 41@3:54."
+  }
+];
+
+
+
+
+        let selectedAnswers = {};
+        let submitted = false;
+
+        function createQuiz() {
+            const quizContainer = document.getElementById('quiz-container');
+            
+            questions.forEach(question => {
+                const questionCard = document.createElement('div');
+                questionCard.className = 'question-card';
+                
+                questionCard.innerHTML = `
+                    <div class="question-text">Q${question.id}. ${question.question}</div>
+                    <div class="options-container">
+                        ${question.options.map((option, index) => `
+                            <label class="option" data-question="${question.id}" data-option="${index}">
+                                <input type="radio" name="question${question.id}" value="${index}">
+                                ${option}
+                            </label>
+                        `).join('')}
+                    </div>
+                    <div class="feedback" id="feedback-${question.id}">
+                        <div class="result-icon">
+                            <span class="icon"></span>
+                            <span class="result-text"></span>
+                        </div>
+                        <div class="explanation">${question.explanation}</div>
+                    </div>
+                `;
+                
+                quizContainer.appendChild(questionCard);
+            });
+
+            document.querySelectorAll('.option').forEach(option => {
+                option.addEventListener('click', handleOptionSelect);
+            });
+
+            document.getElementById('submit-btn').addEventListener('click', handleSubmit);
+        }
+
+        function handleOptionSelect(event) {
+            if (submitted) return;
+
+            const questionId = parseInt(event.currentTarget.dataset.question);
+            const optionIndex = parseInt(event.currentTarget.dataset.option);
+
+            selectedAnswers[questionId] = optionIndex;
+
+            const questionOptions = document.querySelectorAll(`.option[data-question="${questionId}"]`);
+            questionOptions.forEach(option => {
+                option.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+
+            const radioButton = event.currentTarget.querySelector('input[type="radio"]');
+            radioButton.checked = true;
+        }
+
+        function handleSubmit() {
+            if (Object.keys(selectedAnswers).length < questions.length) {
+                alert("Please answer all questions before submitting!");
+                return;
+            }
+
+            submitted = true;
+            let score = 0;
+
+            questions.forEach(question => {
+                const isCorrect = selectedAnswers[question.id] === question.correctAnswer;
+                if (isCorrect) score++;
+
+                const feedback = document.getElementById(`feedback-${question.id}`);
+                feedback.classList.add('visible');
+
+                const resultIcon = feedback.querySelector('.result-icon');
+                const resultText = feedback.querySelector('.result-text');
+                
+                if (isCorrect) {
+                    resultIcon.classList.add('correct');
+                    resultText.textContent = 'Correct Answer +1';
+                } else {
+                    resultIcon.classList.add('wrong');
+                    resultText.textContent = 'Wrong Answer +0';
+                }
+
+                const options = document.querySelectorAll(`.option[data-question="${question.id}"]`);
+                options.forEach((option, index) => {
+                    if (index === question.correctAnswer) {
+                        option.classList.add('correct');
+                    } else if (index === selectedAnswers[question.id]) {
+                        option.classList.add('wrong');
+                    }
+                });
+            });
+
+            document.getElementById('score').textContent = `Score: ${score}/${questions.length}`;
+
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.textContent = 'Try Again';
+            submitBtn.removeEventListener('click', handleSubmit);
+            submitBtn.addEventListener('click', resetQuiz);
+        }
+
+        function resetQuiz() {
+            location.reload();
+        }
+
+        createQuiz();
+    </script>
+</body>
+</html>
